@@ -1,6 +1,6 @@
-import Task from "../models/Task.model";
 
-export const getAllTasks = async (req, res) => {
+
+module.exports.getAllTasks = async (req, res) => {
     try {
        
     } catch (error) {
@@ -8,7 +8,7 @@ export const getAllTasks = async (req, res) => {
     }
 }
 
-export const getTaskById = async(req, res) => {
+module.exports.getTaskById = async(req, res) => {
     try {
    
     } catch (error) {
@@ -17,7 +17,7 @@ export const getTaskById = async(req, res) => {
 }
 
 
-export const createTask = async (req, res) => {
+module.exports.createTask = async (req, res) => {
     try {
         
     } catch (error) {
@@ -25,7 +25,7 @@ export const createTask = async (req, res) => {
     }
 }
 
-export const updateTaskById = async (req, res) => {
+module.exports.updateTaskById = async (req, res) => {
     try {
         
     } catch (error) {
@@ -33,7 +33,7 @@ export const updateTaskById = async (req, res) => {
     }
 }
 
-export const deleteTaskById = async (req, res) => {
+module.exports.deleteTaskById = async (req, res) => {
     try {
         
     } catch (error) {
