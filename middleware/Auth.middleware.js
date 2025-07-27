@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
+const User = require('../models/User.model.js');
 
 
 module.exports.protectedRoute = async (req, res, next) => {
@@ -11,8 +11,8 @@ module.exports.protectedRoute = async (req, res, next) => {
         if(!decoded){
            return res.status(401).json({message:"Unauthorized - Invalid Token"});
         }
-        const user = await User.findById(decoded.userId).select("-password");
-        
+        const user = await User.findById(decoded.user._id).select("-password");
+
         if(!user){
             return res.status(404).json({ message:"User is not found"})
         }
@@ -32,7 +32,8 @@ module.exports.adminValidation = async (req, res, next) => {
         if(!decoded){
            return res.status(401).json({message:"Unauthorized - Invalid Token"});
         }
-        const user = await User.findById(decoded.userId).select("-password");
+        console.log("Decoded: ", decoded);
+        const user = await User.findById(decoded.user._id).select("-password");
         
         if(!user){
             return res.status(404).json({ message:"User is not found"})

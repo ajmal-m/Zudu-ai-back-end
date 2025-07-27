@@ -1,4 +1,4 @@
-const Task = require('../models/task.model');
+const Task = require('../models/Task.model.js');
 
 module.exports.getAllTasks = async (req, res) => {
     try {
@@ -27,7 +27,8 @@ module.exports.createTask = async (req, res) => {
         const newTask = new Task(req.body);
         const savedTask = await newTask.save();
         res.status(201).json(savedTask);
-    } catch (error) {   
+    } catch (error) {  
+        console.log("Error creating task: ", error.message); 
         res.status(500).json({ message: "Internal Server Error"});
     }
 }

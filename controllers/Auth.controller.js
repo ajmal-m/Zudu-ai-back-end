@@ -1,6 +1,7 @@
 const {generateToken} = require('../lib/utils.js');
-const User = require('../models/user.model.js');
-const bcrypt = require('bcrypt');
+const User = require('../models/User.model.js');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 module.exports.Register = async (req,res) => {
     const {email, name, password, role} = req.body;
@@ -24,13 +25,15 @@ module.exports.Register = async (req,res) => {
 
         if(newUser){
             // Generate JWT token here
-            generateToken(newUser, res);
+            const {accessToken} =await  generateToken(newUser, res);
+            // Save the user to the database
             await newUser.save();
             res.status(200).json({
                 _id: newUser._id,
                 email: newUser.email,
                 name: newUser.name,
-                role: newUser.role
+                role: newUser.role,
+                token: accessToken
             })
         }else{
             res.status(400).json({ message:"Invalid user data."})
@@ -44,22 +47,26 @@ module.exports.Register = async (req,res) => {
 
 module.exports.LogIn = async (req,res) => {
     const {email, password} = req.body;
+    console.log(req.body)
     try {
-        if(!email || !password) return res.status(400).json({ message:"All fields are required."});
+        if(!email || !password) return res.status(400).json({ success:false, message:"All fields are required."});
         const user = await User.findOne({email});
-        if(!user) return res.status(400).json({message:"Invalid credentials."});
+        if(!user) return res.status(400).json({success:false, message:"Invalid credentials."});
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-        if(!isPasswordCorrect) return res.status(400).json({ message:"Invalid credentials."});
+        if(!isPasswordCorrect) return res.status(400).json({ success:false, message:"Invalid credentials."});
 
-        generateToken(user, res);
+        const {accessToken} = await generateToken(user, res);
+
+        console.log("Access Token: ", accessToken);
 
         res.status(200).json({
             _id: user._id,
             email: user.email,
             name: user.name,
-            role: user.role
+            role: user.role,
+            token: accessToken  
         });
     } catch (error) {
         console.log('Error in Login controller ', error.message);
@@ -72,14 +79,17 @@ module.exports.LogIn = async (req,res) => {
 module.exports.Refresh = async(req, res) => {
     try {
         const token = req.cookies.refreshToken;
+        console.log(token)
         if (!token) return res.sendStatus(401);
 
         jwt.verify(token, process.env.REFRESH_SECRET, (err, user) => {
             if (err) return res.sendStatus(403);
-            const newAccessToken = jwt.sign({ id: user.id }, process.env.ACCESS_SECRET, { expiresIn: '15m' });
-            res.json({ accessToken: newAccessToken });
+            console.log("User: ", user);
+            const newAccessToken = jwt.sign({ user: user }, process.env.ACCESS_SECRET, { expiresIn: '15m' });
+            res.json({ accessToken: newAccessToken, user : user?.user});
         });
     } catch (error) {
+        console.log('Error in Refresh controller ', error.message);
         res.status(500).json({ message: "Internal server error."})
     }
 }
