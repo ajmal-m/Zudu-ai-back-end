@@ -46,5 +46,42 @@ REFRESH_SECRET=
 ```bash
 node index.js
 ```
+### 🗂️ Project Structure
+
+```bash
+node-server/
+├── controllers/         # Route handler logic
+├── middleware/          # JWT and other middleware
+├── models/              # Mongoose schemas
+├── routes/              # API endpoints
+├── .env                 # Environment variables (not committed)
+├── .env.example         # Example env config
+├── app.js               # Express app config
+├── server.js            # Entry point
+├── package.json
+└── README.
+```
+### 📡 API Base URL
+```bash
+http://localhost:3000
+
+```
+### 🔐 JWT Usage
+Access tokens are signed using ACCESS_SECRET
+
+Refresh tokens use REFRESH_SECRET
+
+Store them securely on the client
 
 
+### 🛠️ Built With
+
+Express
+
+Mongoose
+
+dotenv
+
+jsonwebtoken
+
+Nodemon (for dev)
