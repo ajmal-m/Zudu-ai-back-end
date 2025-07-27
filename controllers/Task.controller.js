@@ -2,8 +2,31 @@ const Task = require('../models/Task.model.js');
 
 module.exports.getAllTasks = async (req, res) => {
     try {
-        const tasks = await Task.find();
-        res.status(200).json(tasks);
+        const { status, priority, sortBy = 'dueDate', order = 'asc', page = 1, limit = 10 } = req.query;
+
+        const query = {};
+        if (status) query.status = status;
+        if (priority) query.priority = priority;
+
+        const sortOrder = order === 'desc' ? -1 : 1;
+
+        const skip = (Number(page) - 1) * Number(limit);
+
+        const tasks = await Task.find(query)
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(Number(limit))
+        .populate('assignedTo managedBy', 'name email'); 
+
+        const totalTasks = await Task.countDocuments(query);
+
+        res.status(200).json({
+            data: tasks,
+            total: totalTasks,
+            page: Number(page),
+            limit: Number(limit),
+            totalPages: Math.ceil(totalTasks / limit),
+        });
     } catch (error) {
         res.status(500).json({ message:"Internal Server Error"});
     }

@@ -10,7 +10,7 @@ const TaskSchema = new  Schema({
     },
     status: {
         type: String,
-        enum: ['ToDo', 'in-progress', 'Done'],
+        enum: ['ToDo', 'InProgress', 'Done'],
         default: 'ToDo'
     },
     priority: {
